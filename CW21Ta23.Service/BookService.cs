@@ -11,14 +11,16 @@ public class BookService : IBookService
     private readonly IAuthorRepository _authorRepository;
     private readonly ICategoryRepository _categoryRepository;
     private readonly IPublisherRepository _publisherRepository;
+    private readonly ITagRepository _tagRepository;
 
     public BookService(IBookRepository bookRepository, IAuthorRepository authorRepository,
-        ICategoryRepository categoryRepository, IPublisherRepository publisherRepository)
+        ICategoryRepository categoryRepository, IPublisherRepository publisherRepository, ITagRepository tagRepository)
     {
         _bookRepository = bookRepository;
         _authorRepository = authorRepository;
         _categoryRepository = categoryRepository;
         _publisherRepository = publisherRepository;
+        _tagRepository = tagRepository;
     }
 
     public async Task<bool> BookExists(string title)
@@ -173,10 +175,110 @@ public class BookService : IBookService
         var book = await _bookRepository.GetBookWithDetailsAsync(bookId);
         
         if(book == null)
-            throw new ArgumentNullException("book not found");
+            throw new Exception("book not found");
         return book;
 
     }
     
+    public async Task AddTagToBook(AddTagToBookDto dto)
+    {
+        var book = await _bookRepository.FindWithTagsAsync(dto.BookId);
+
+        if (book == null)
+            throw new Exception("book not found");
+
+        var tag = await _tagRepository.FindByIdAsync(dto.TagId);
+
+        if (tag == null)
+            throw new Exception("tag not found");
+
+        if (book.Tags.Any(t => t.Id == dto.TagId))
+            throw new Exception("tag already added");
+
+        book.Tags.Add(tag);
+
+        await _bookRepository.UpdateAsync(book);
+        
+    }
+
+    public async Task<bool> RemoveTagFromBook(RemoveTagFromBookDto dto)
+    {
+        
+        var book = await _bookRepository.FindWithTagsAsync(dto.BookId);
+
+        if (book == null)
+            return false;
+
+       
+        var tag = await _tagRepository.FindByIdAsync(dto.TagId);
+
+        if (tag == null)
+            return false;
+
+        
+        var existingTag = book.Tags.FirstOrDefault(t => t.Id == dto.TagId);
+
+        if (existingTag == null)
+            return false;
+        
+        book.Tags.Remove(existingTag);
+        
+        await _bookRepository.UpdateAsync(book);
+
+        return true;
+    }
+
+    public async Task<List<BookWithStockDto>> GetBooksWithStock()
+    {
+        var books = await _bookRepository.QueryAsync(b => b.Stock > 0);
+       return books.Select(b=>new BookWithStockDto
+        {
+            Title = b.Title,
+            Stock = b.Stock
+        }).ToList();
+    }
+    
+    public async Task<BookWithDetailTotaDto?> GetBookByName(string bookName)
+    {
+        if (string.IsNullOrWhiteSpace(bookName))
+            throw new Exception("book name should inter");
+        
+        var book = await _bookRepository.GetBookByName(bookName);
+        if (book == null)
+            throw new Exception("book not found");
+        
+        return book;
+    }
+
+    public async Task<bool> CreateBookAsync(CreateBookDto dto)
+    {
+        if (string.IsNullOrWhiteSpace(dto.Title))
+            throw new Exception("title is required");
+
+        var author = await _authorRepository.FindByIdAsync(dto.AuthorId);
+        if (author == null)
+            throw new Exception("author not found");
+
+        var category = await _categoryRepository.FindByIdAsync(dto.CategoryId);
+        if (category == null)
+            throw new Exception("category not found");
+
+        var publisher = await _publisherRepository.FindByIdAsync(dto.PublisherId);
+        if (publisher == null)
+            throw new Exception("publisher not found");
+
+        var book = new Book
+        {
+            Title = dto.Title,
+            Price = dto.Price,
+            Stock = dto.Stock,
+            AuthorId = dto.AuthorId,
+            CategoryId = dto.CategoryId,
+            PublisherId = dto.PublisherId
+        };
+        await _bookRepository.AddAsync(book);
+
+        return true;
+    }
 
 }

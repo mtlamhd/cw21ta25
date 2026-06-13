@@ -45,5 +45,31 @@ public class BookRepository : GenericRepository<Book> , IBookRepository
                 Tags = b.Tags.Select(t => t.Name).ToList(),
                 
             }).FirstOrDefaultAsync();
+        
+         
+    }
+    
+    public async Task<Book?> FindWithTagsAsync(int bookId)
+    {
+        return await _context.Books
+            .Include(b => b.Tags)
+            .FirstOrDefaultAsync(b => b.Id == bookId);
+    }
+
+    public async Task<BookWithDetailTotaDto?> GetBookByName(string bookName)
+    {
+        return await _context.Books.AsNoTracking()
+            .Where(b => b.Title.ToLower() == bookName.ToLower())
+            .Select(b => new BookWithDetailTotaDto
+            {
+                Title = b.Title,
+                Price = b.Price,
+                Stock = b.Stock,
+                AuthorName = b.Author.FullName,
+                CategoryName = b.Category.Title,
+                PublisherName = b.Publisher.Name,
+                PublishYear = b.PublishYear,
+                Tags = b.Tags.Select(t => t.Name).ToList()
+            }).FirstOrDefaultAsync();
     }
 }

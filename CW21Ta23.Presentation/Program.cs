@@ -5,12 +5,13 @@ using CW21Ta23.Infrastructure.Data;
 using CW21Ta23.Infrastructure.Repositiries;
 using CW21Ta23.Service;
 
-var context = new AppDbContext();
-var bookRepo = new BookRepository(context);
-var categoryRepo = new CategoryRepository(context);
-var publisherRepo = new PublisherRepository(context);
-var authorRepo = new AuthorReposiory(context);
-var bookService = new BookService(bookRepo,authorRepo, categoryRepo, publisherRepo);
+// var context = new AppDbContext();
+// var bookRepo = new BookRepository(context);
+// var categoryRepo = new CategoryRepository(context);
+// var publisherRepo = new PublisherRepository(context);
+// var authorRepo = new AuthorReposiory(context);
+// var tagRepo = new TagRepository(context);
+// var bookService = new BookService(bookRepo,authorRepo, categoryRepo, publisherRepo,tagRepo);
 
 // Console.Write("Book Id  ");
 // int bookId = int.Parse(Console.ReadLine());
@@ -50,3 +51,5 @@ var bookService = new BookService(bookRepo,authorRepo, categoryRepo, publisherRe
 //     Console.WriteLine($"ناشر: {book.PublisherName}");
 //     Console.WriteLine($"تگ‌ها: {string.Join(", ", book.Tags)}");
 // }
+
+Console.Write("sss");

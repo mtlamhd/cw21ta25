@@ -4,9 +4,9 @@ using CW21Ta23.Infrastructure.Data;
 
 namespace CW21Ta23.Infrastructure.Repositiries;
 
-public class AuthorReposiory : GenericRepository<Author> , IAuthorRepository
+public class AuthorRepository : GenericRepository<Author> , IAuthorRepository
 {
-    public AuthorReposiory(AppDbContext context) : base(context)
+    public AuthorRepository(AppDbContext context) : base(context)
     {
     }
 }

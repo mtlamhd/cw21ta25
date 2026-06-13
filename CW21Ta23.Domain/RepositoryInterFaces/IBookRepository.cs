@@ -7,4 +7,7 @@ public interface IBookRepository : IGenericRepository<Book>
 {
     Task<List<BookWithDetailsDto>> GetAllBooksWithDetailsAsync();
     Task<BookWithDetailTotaDto?> GetBookWithDetailsAsync(int bookId);
+    Task<Book?> FindWithTagsAsync(int bookId);
+    Task<BookWithDetailTotaDto?> GetBookByName(string bookName);
+
 }
