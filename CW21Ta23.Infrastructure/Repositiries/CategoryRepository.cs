@@ -70,6 +70,15 @@ public class CategoryRepository : GenericRepository<Category> , ICategoryReposit
             })
             .ToListAsync();
     }
-    
+    public async Task<bool> ExistsByTitleAsync(string title)
+    {
+        return await _context.Categories
+            .AnyAsync(c => c.Title == title);
+    }
+    public async Task<bool> HasBooksAsync(int categoryId)
+    {
+        return await _context.Books
+            .AnyAsync(b => b.CategoryId == categoryId);
+    }
     
 }

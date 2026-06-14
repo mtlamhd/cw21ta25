@@ -130,4 +130,59 @@ public class AuthorService : IAuthorService
         return authors;
             
     }
+
+    public async Task<int> CreateAuthor(CreateAuthorDto dto)
+    {
+        if(string.IsNullOrWhiteSpace(dto.FullName))
+            throw new Exception("Fullname is Required");
+        if (dto.FullName.Length > 100)
+            throw new Exception("FullName is too long");
+        var author = new Author
+        {
+            FullName = dto.FullName,
+            BirthDate = dto.BirthDate ?? default,
+            Country = dto.Country
+        };
+        await _authorRepository.AddAsync(author);
+        return author.Id;
+    }
+
+    public async Task<bool> DeleteAuthorAsync(int authorId)
+    {
+        var author = await _authorRepository.GetByIdWithBookAsync(authorId);
+
+        if (author == null)
+            throw new Exception("author not found");
+
+        if (author.Books.Any())
+            throw new Exception("cannot delete author because it has books");
+
+        await _authorRepository.HardDeleteAsync(author);
+
+        return true;
+    }
+    
+    public async Task<bool> UpdateAuthorAsync(int id, UpdateAuthorDto dto)
+    {
+        var author = await _authorRepository.FindByIdAsync(id);
+
+        if (author == null)
+            throw new Exception("author not found");
+
+        if (string.IsNullOrWhiteSpace(dto.FullName))
+            throw new Exception("full name is required");
+
+        if (dto.FullName.Length > 100)
+            throw new Exception("full name is too long");
+
+        author.FullName = dto.FullName;
+        author.BirthDate = dto.BirthDate ?? default;
+        author.Country = dto.Country;
+
+        await _authorRepository.UpdateAsync(author);
+
+        return true;
+    }
+    
+    
 }

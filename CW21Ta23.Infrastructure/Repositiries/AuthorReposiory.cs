@@ -63,4 +63,11 @@ public class AuthorRepository : GenericRepository<Author> , IAuthorRepository
                 Books = a.Books.Select(b => b.Title).ToList()
             }).ToListAsync();
     }
+
+    public async Task<Author?> GetByIdWithBookAsync(int authorId)
+    {
+        return await  _context.Authors.
+            Include(a=>a.Books)
+            .FirstOrDefaultAsync(a => a.Id == authorId);
+    }
 }

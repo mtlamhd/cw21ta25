@@ -101,4 +101,69 @@ public class CategoryService : ICategoryService
     {
         return await _categoryRepository.GetCategoriesWithAvailableBooksAsync();
     }
+
+    public async Task<int> CreateCategoryAsync(CreateCategoryDto dto)
+    {
+        if (string.IsNullOrWhiteSpace(dto.Title))
+            throw new Exception("category title is required");
+
+        dto.Title = dto.Title.Trim();
+
+        if (await _categoryRepository.ExistsByTitleAsync(dto.Title))
+            throw new Exception("category already exists");
+
+        var category = new Category
+        {
+            Title = dto.Title,
+            Description = dto.Description
+        };
+
+        await _categoryRepository.AddAsync(category);
+
+        return category.Id;
+    }
+
+    public async Task<bool> UpdateCategoryAsync(int id, UpdateCategoryDto dto)
+    {
+        var category = await _categoryRepository.FindByIdAsync(id);
+
+        if (category == null)
+            throw new Exception("category not found");
+
+        if (string.IsNullOrWhiteSpace(dto.Title))
+            throw new Exception("category title is required");
+
+        dto.Title = dto.Title.Trim();
+
+        var exists = (await _categoryRepository
+                .QueryAsync(c => c.Title == dto.Title && c.Id != id))
+            .Any();
+
+        if (exists)
+            throw new Exception("category already exists");
+
+        category.Title = dto.Title;
+        category.Description = dto.Description;
+
+        await _categoryRepository.UpdateAsync(category);
+
+        return true;
+    }
+    
+    public async Task<bool> DeleteCategoryAsync(int id)
+    {
+        var category = await _categoryRepository.FindByIdAsync(id);
+
+        if (category == null)
+            throw new Exception("category not found");
+
+        var hasBooks = await _categoryRepository.HasBooksAsync(id);
+
+        if (hasBooks)
+            throw new Exception("cannot delete category because it has books");
+
+        await _categoryRepository.HardDeleteAsync(category);
+
+        return true;
+    }
 }

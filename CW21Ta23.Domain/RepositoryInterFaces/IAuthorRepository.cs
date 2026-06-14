@@ -9,4 +9,6 @@ public interface IAuthorRepository : IGenericRepository<Author>
     Task<AuthorWithBookDto?> GetAuthorByIdAsync(int authorId);
     Task<List<AuthorWithBooksCountDto>> GetAuthorsWithMoreThanTwoBooksAsync();
     Task<List<AuthorWithBookDto>> GeAuthorsByName(string authorName);
+     Task<Author?> GetByIdWithBookAsync(int authorId);
+    
 }

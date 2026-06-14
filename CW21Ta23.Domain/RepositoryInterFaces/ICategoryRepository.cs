@@ -9,4 +9,7 @@ public interface ICategoryRepository : IGenericRepository<Category>
     Task<CategoryDetailDto?> GetCategoryByIdAsync(int categoryId);
     Task<List<BookModelDto>> GetBooksByCategoryAsync(int categoryId);
     Task<List<CategoryWithBookCountDto>> GetCategoriesWithAvailableBooksAsync();
+    Task<bool> ExistsByTitleAsync(string title);
+    Task<bool> HasBooksAsync(int categoryId);
+    
 }

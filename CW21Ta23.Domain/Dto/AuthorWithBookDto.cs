@@ -8,5 +8,7 @@ public class AuthorWithBookDto
         public string Country { get; set; }
 
         public List<string> Books { get; set; }
+        
+      // public bool HasAnyBooks { get; set; }
     
 }
