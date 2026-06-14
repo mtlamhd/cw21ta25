@@ -281,4 +281,69 @@ public class BookService : IBookService
         return true;
     }
 
+    public async Task<List<BookModelDto>> GetBookByCategory(int categoryId)
+    {
+        
+        var category = await _categoryRepository.FindByIdAsync(categoryId);
+        if (category == null)
+            throw new Exception("category not found");
+        
+        return await _bookRepository.GetBookByCategory(categoryId);
+    }
+
+    public async Task<List<BookModelDto>> GetBookByAuthor(int authorId)
+    {
+        var author = await _authorRepository.FindByIdAsync(authorId);
+        if (author == null)
+            throw new Exception("author not found");
+        
+        return await _bookRepository.GetBookByAuthor(authorId);
+    }
+
+    public async Task<List<BookModelDto>> GetBookByPublisher(int publisherId)
+    {
+        var publisher = await _publisherRepository.FindByIdAsync(publisherId);
+        if (publisher == null)
+            throw new Exception("publisher not found");
+        
+        return await _bookRepository.GetBookByAuthor(publisherId);
+    }
+
+    public async Task<List<BookModelDto>> GetBooksByTag(int tagId)
+    {
+        var tag = await _tagRepository.FindByIdAsync(tagId);
+
+        if (tag == null)
+            throw new Exception("tag not found");
+
+        return await _bookRepository.GetBooksByTag(tagId);
+    }
+    
+   public async Task<List<BookModelDto>> GetBooksByPriceRange(decimal minPrice, decimal maxPrice)
+    {
+        if (minPrice < 0)
+            throw new Exception("min price is invalid");
+
+        if (maxPrice < 0)
+            throw new Exception("max price is invalid");
+
+        if (minPrice > maxPrice)
+            throw new Exception("min price cannot be greater than max price");
+
+        return await _bookRepository
+            .GetBooksByPriceRange(minPrice, maxPrice);
+    }
+
+    public async Task<List<BookModelDto>> GetBooksPublishedAfterYear(int year)
+    {
+        
+            if (year <= 0)
+                throw new Exception("invalid year");
+
+            return await _bookRepository
+                .GetBooksPublishedAfterYear(year);
+        
+    }
+    
+        
 }

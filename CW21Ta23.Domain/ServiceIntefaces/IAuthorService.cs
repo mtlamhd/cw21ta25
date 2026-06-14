@@ -7,4 +7,12 @@ public interface IAuthorService
     Task<List<AuthorWithBooksCountDto>> GetAuthorWithBooksCountAsync();
 
     Task<List<AuthorTotalPriceDto>> GetAuthorTotalPrices();
+    
+    Task<List<AuthorWithBooksCountDto>> GetAuthorsWithBooksCount();
+
+    Task<AuthorWithBookDto> GetAuthorByIdAsync(int authorId);
+
+    Task<List<AuthorWithBooksCountDto>> GetAuthorsWithMoreThanTwoBooksAsync();
+
+    Task<List<AuthorWithBookDto>> GeAuthorsByName(string authorName);
 }

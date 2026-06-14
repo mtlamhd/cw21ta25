@@ -72,4 +72,121 @@ public class BookRepository : GenericRepository<Book> , IBookRepository
                 Tags = b.Tags.Select(t => t.Name).ToList()
             }).FirstOrDefaultAsync();
     }
+
+    public async Task<List<BookModelDto>> GetBookByCategory(int categoryId)
+    {
+        return await _context.Books.AsNoTracking()
+            .Where(b => b.CategoryId == categoryId)
+            .Select(b => new BookModelDto
+                {
+                    Title = b.Title,
+                    Price = b.Price,
+                    Stock = b.Stock,
+                    PublishYear = b.PublishYear,
+                    AuthorName = b.Author.FullName,
+                    PublisherName = b.Publisher.Name,
+                    CategoryName = b.Category.Title,
+                    Tags = b.Tags.Select(t=>t.Name).ToList()
+
+                }
+
+            ).ToListAsync();
+    }
+    public async Task<List<BookModelDto>> GetBookByAuthor(int authorId)
+    {
+        return await _context.Books.AsNoTracking()
+            .Where(b => b.AuthorId == authorId)
+            .Select(b => new BookModelDto
+                {
+                    Title = b.Title,
+                    Price = b.Price,
+                    Stock = b.Stock,
+                    PublishYear = b.PublishYear,
+                    AuthorName = b.Author.FullName,
+                    PublisherName = b.Publisher.Name,
+                    CategoryName = b.Category.Title,
+                    Tags = b.Tags.Select(t=>t.Name).ToList()
+
+                }
+
+            ).ToListAsync();
+    }
+    
+    public async Task<List<BookModelDto>> GetBookByPublisher(int publisherId)
+    {
+        return await _context.Books.AsNoTracking()
+            .Where(b => b.Publisher.Id == publisherId)
+            .Select(b => new BookModelDto
+                {
+                    Title = b.Title,
+                    Price = b.Price,
+                    Stock = b.Stock,
+                    PublishYear = b.PublishYear,
+                    AuthorName = b.Author.FullName,
+                    PublisherName = b.Publisher.Name,
+                    CategoryName = b.Category.Title,
+                    Tags = b.Tags.Select(t=>t.Name).ToList()
+
+                }
+
+            ).ToListAsync();
+    }
+
+    public async Task<List<BookModelDto>> GetBooksByTag(int tagId)
+    {
+        return await _context.Books
+            .AsNoTracking()
+            .Where(b => b.Tags.Any(t => t.Id == tagId))
+            .Select(b => new BookModelDto
+            {
+                Title = b.Title,
+                Price = b.Price,
+                Stock = b.Stock,
+                PublishYear = b.PublishYear,
+                AuthorName = b.Author.FullName,
+                PublisherName = b.Publisher.Name,
+                CategoryName = b.Category.Title,
+                Tags = b.Tags.Select(t => t.Name).ToList()
+            })
+            .ToListAsync();
+    }
+
+    public async Task<List<BookModelDto>> GetBooksByPriceRange(decimal minPrice, decimal maxPrice)
+    {
+        return await _context.Books
+            .AsNoTracking()
+            .Where(b => b.Price >= minPrice &&
+                        b.Price <= maxPrice)
+            .Select(b => new BookModelDto
+            {
+                Title = b.Title,
+                Price = b.Price,
+                Stock = b.Stock,
+                PublishYear = b.PublishYear,
+                AuthorName = b.Author.FullName,
+                PublisherName = b.Publisher.Name,
+                CategoryName = b.Category.Title,
+                Tags = b.Tags.Select(t => t.Name).ToList()
+            })
+            .ToListAsync();
+    }
+    
+    public async Task<List<BookModelDto>> GetBooksPublishedAfterYear(int year)
+    {
+        return await _context.Books
+            .AsNoTracking()
+            .Where(b => b.PublishYear > year)
+            .Select(b => new BookModelDto
+            {
+                Title = b.Title,
+                Price = b.Price,
+                Stock = b.Stock,
+                PublishYear = b.PublishYear,
+                AuthorName = b.Author.FullName,
+                PublisherName = b.Publisher.Name,
+                CategoryName = b.Category.Title,
+                Tags = b.Tags.Select(t => t.Name).ToList()
+            })
+            .ToListAsync();
+    }
 }

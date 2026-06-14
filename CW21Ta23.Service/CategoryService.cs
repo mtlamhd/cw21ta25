@@ -68,8 +68,37 @@ public class CategoryService : ICategoryService
     //             .Sum(b => b.Stock)
     //     }).ToList();
     // }
+
+
+    public async Task<List<CategoryWithBookCountDto>> GetAllCategoriesWithBookCountAsync()
+    {
         
-    
-    
+            return await _categoryRepository.GetAllCategoriesWithBookCountAsync();
     
     }
+
+    public async Task<CategoryDetailDto> GetCategoryByIdAsync(int categoryId)
+    {
+        var category = await _categoryRepository.GetCategoryByIdAsync(categoryId);
+
+        if (category == null)
+            throw new Exception("category not found");
+
+        return category;
+    }
+
+    public async Task<List<BookModelDto>> GetBooksByCategoryAsync(int categoryId)
+    {
+        var category = await _categoryRepository.FindByIdAsync(categoryId);
+
+        if (category == null)
+            throw new Exception("category not found");
+
+        return await _bookRepository.GetBookByCategory(categoryId);
+    }
+    
+    public async Task<List<CategoryWithBookCountDto>> GetCategoriesWithAvailableBooksAsync()
+    {
+        return await _categoryRepository.GetCategoriesWithAvailableBooksAsync();
+    }
+}

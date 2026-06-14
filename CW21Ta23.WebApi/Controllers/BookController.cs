@@ -73,5 +73,95 @@ public class BookController : ControllerBase
             return NotFound(ex.Message);
         }
     }
+    [HttpGet("category/{categoryId}")]
+    public async Task<IActionResult> GetBookByCategory(int categoryId)
+    {
+        try
+        {
+            var books = await _bookService.GetBookByCategory(categoryId);
+
+            return Ok(books);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+    [HttpGet("author/{authorId}")]
+    public async Task<IActionResult> GetBookByAuthor(int authorId)
+    {
+        try
+        {
+            var books = await _bookService.GetBookByAuthor(authorId);
+
+            return Ok(books);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+    [HttpGet("publisher/{publisherId}")]
+    public async Task<IActionResult> GetBookByPublisher(int publisherId)
+    {
+        try
+        {
+            var books = await _bookService.GetBookByPublisher(publisherId);
+
+            return Ok(books);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+    [HttpGet("tag/{tagId}")]
+    public async Task<IActionResult> GetBooksByTag(int tagId)
+    {
+        try
+        {
+            var books = await _bookService.GetBooksByTag(tagId);
+
+            return Ok(books);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+    
+    [HttpGet("price-range")]
+    public async Task<IActionResult> GetBooksByPriceRange(
+        decimal minPrice,
+        decimal maxPrice)
+    {
+        try
+        {
+            var books = await _bookService
+                .GetBooksByPriceRange(minPrice, maxPrice);
+
+            return Ok(books);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+    [HttpGet("published-after")]
+    public async Task<IActionResult> GetBooksPublishedAfterYear(int year)
+    {
+        try
+        {
+            var books = await _bookService
+                .GetBooksPublishedAfterYear(year);
+
+            return Ok(books);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+    
     
 }

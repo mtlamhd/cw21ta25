@@ -98,8 +98,36 @@ public class AuthorService : IAuthorService
             })
             .ToList();
     }
-    
-    
-    
-    
+
+    public async Task<List<AuthorWithBooksCountDto>> GetAuthorsWithBooksCount()
+    {
+        var authors = await _authorRepository.GetAuthorsWithBooksCount();
+        return authors;
+    }
+
+    public async Task<AuthorWithBookDto> GetAuthorByIdAsync(int authorId)
+    {
+        var author = await _authorRepository.GetAuthorByIdAsync(authorId);
+
+        if (author == null)
+            throw new Exception("author not found");
+
+        return author;
+    }
+
+    public async Task<List<AuthorWithBooksCountDto>> GetAuthorsWithMoreThanTwoBooksAsync()
+    {
+        return await _authorRepository.GetAuthorsWithMoreThanTwoBooksAsync();
+    }
+
+    public async Task<List<AuthorWithBookDto>> GeAuthorsByName(string authorName)
+    {
+        if(string.IsNullOrWhiteSpace(authorName))
+            throw new Exception("authorName is Required");
+        
+        var authors = await _authorRepository.GeAuthorsByName(authorName);
+        
+        return authors;
+            
+    }
 }
