@@ -2,6 +2,7 @@ using CW21Ta23.Domain.Dto;
 using CW21Ta23.Domain.Entities;
 using CW21Ta23.Domain.RepositoryInterFaces;
 using CW21Ta23.Domain.ServiceIntefaces;
+using CW21Ta23.Service.Exceptions;
 
 namespace CW21Ta23.Service;
 
@@ -82,7 +83,7 @@ public class CategoryService : ICategoryService
         var category = await _categoryRepository.GetCategoryByIdAsync(categoryId);
 
         if (category == null)
-            throw new Exception("category not found");
+            throw new ItemNotFoundException("Category",categoryId);
 
         return category;
     }
@@ -92,7 +93,7 @@ public class CategoryService : ICategoryService
         var category = await _categoryRepository.FindByIdAsync(categoryId);
 
         if (category == null)
-            throw new Exception("category not found");
+            throw new ItemNotFoundException("Category",categoryId);
 
         return await _bookRepository.GetBookByCategory(categoryId);
     }
@@ -105,12 +106,12 @@ public class CategoryService : ICategoryService
     public async Task<int> CreateCategoryAsync(CreateCategoryDto dto)
     {
         if (string.IsNullOrWhiteSpace(dto.Title))
-            throw new Exception("category title is required");
+            throw BadRequestException.Required($"Category Name");
 
         dto.Title = dto.Title.Trim();
 
         if (await _categoryRepository.ExistsByTitleAsync(dto.Title))
-            throw new Exception("category already exists");
+            throw new ConflictException("Category",$"{dto.Title}");
 
         var category = new Category
         {
@@ -128,10 +129,10 @@ public class CategoryService : ICategoryService
         var category = await _categoryRepository.FindByIdAsync(id);
 
         if (category == null)
-            throw new Exception("category not found");
+            throw new ItemNotFoundException("Category",id);
 
         if (string.IsNullOrWhiteSpace(dto.Title))
-            throw new Exception("category title is required");
+            throw BadRequestException.Required("Category");
 
         dto.Title = dto.Title.Trim();
 
@@ -140,7 +141,7 @@ public class CategoryService : ICategoryService
             .Any();
 
         if (exists)
-            throw new Exception("category already exists");
+            throw new ConflictException("Category",$"{id}");
 
         category.Title = dto.Title;
         category.Description = dto.Description;
@@ -155,12 +156,12 @@ public class CategoryService : ICategoryService
         var category = await _categoryRepository.FindByIdAsync(id);
 
         if (category == null)
-            throw new Exception("category not found");
+            throw new ItemNotFoundException("Category",id);
 
         var hasBooks = await _categoryRepository.HasBooksAsync(id);
 
         if (hasBooks)
-            throw new Exception("cannot delete category because it has books");
+            throw BusinessRuleException.CannotDelete("Category", "it has books");
 
         await _categoryRepository.HardDeleteAsync(category);
 

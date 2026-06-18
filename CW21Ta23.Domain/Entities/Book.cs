@@ -26,4 +26,6 @@ public class Book : BaseEntity
     public Publisher Publisher { get; set; }
 
     public List<Tag> Tags { get; set; } = new List<Tag>();
+    
+    public List<OrderItem>? OrderItems { get; set; } = new List<OrderItem>();
 }

@@ -18,4 +18,5 @@ public interface IBookService
     Task<List<BookModelDto>> GetBooksByTag(int tagId);
     Task<List<BookModelDto>> GetBooksByPriceRange(decimal minPrice, decimal maxPrice);
     Task<List<BookModelDto>> GetBooksPublishedAfterYear(int year);
+    Task<int> CreateBook(CreateBookDtoo dto);
 }

@@ -2,6 +2,8 @@ using CW21Ta23.Domain.Dto;
 using CW21Ta23.Domain.Entities;
 using CW21Ta23.Domain.RepositoryInterFaces;
 using CW21Ta23.Domain.ServiceIntefaces;
+using CW21Ta23.Service.Exceptions;
+using ValidationException = System.ComponentModel.DataAnnotations.ValidationException;
 
 namespace CW21Ta23.Service;
 
@@ -193,7 +195,7 @@ public class BookService : IBookService
             throw new Exception("tag not found");
 
         if (book.Tags.Any(t => t.Id == dto.TagId))
-            throw new Exception("tag already added");
+            throw new ConflictException("Tag",$"{dto.TagId}");
 
         book.Tags.Add(tag);
 
@@ -286,7 +288,7 @@ public class BookService : IBookService
         
         var category = await _categoryRepository.FindByIdAsync(categoryId);
         if (category == null)
-            throw new Exception("category not found");
+            throw new ItemNotFoundException("Category",categoryId);
         
         return await _bookRepository.GetBookByCategory(categoryId);
     }
@@ -295,7 +297,7 @@ public class BookService : IBookService
     {
         var author = await _authorRepository.FindByIdAsync(authorId);
         if (author == null)
-            throw new Exception("author not found");
+            throw new ItemNotFoundException("Author",authorId);
         
         return await _bookRepository.GetBookByAuthor(authorId);
     }
@@ -304,7 +306,7 @@ public class BookService : IBookService
     {
         var publisher = await _publisherRepository.FindByIdAsync(publisherId);
         if (publisher == null)
-            throw new Exception("publisher not found");
+            throw new ItemNotFoundException("Publisher",publisherId);
         
         return await _bookRepository.GetBookByAuthor(publisherId);
     }
@@ -314,7 +316,7 @@ public class BookService : IBookService
         var tag = await _tagRepository.FindByIdAsync(tagId);
 
         if (tag == null)
-            throw new Exception("tag not found");
+            throw new ItemNotFoundException("Tag",tagId);
 
         return await _bookRepository.GetBooksByTag(tagId);
     }
@@ -322,13 +324,13 @@ public class BookService : IBookService
    public async Task<List<BookModelDto>> GetBooksByPriceRange(decimal minPrice, decimal maxPrice)
     {
         if (minPrice < 0)
-            throw new Exception("min price is invalid");
+            throw new ValidationException("min price is invalid");
 
         if (maxPrice < 0)
-            throw new Exception("max price is invalid");
+            throw new ValidationException("max price is invalid");
 
         if (minPrice > maxPrice)
-            throw new Exception("min price cannot be greater than max price");
+            throw new ValidationException("min price cannot be greater than max price");
 
         return await _bookRepository
             .GetBooksByPriceRange(minPrice, maxPrice);
@@ -338,12 +340,54 @@ public class BookService : IBookService
     {
         
             if (year <= 0)
-                throw new Exception("invalid year");
+                throw new ValidationException("invalid year");
 
             return await _bookRepository
                 .GetBooksPublishedAfterYear(year);
         
     }
-    
+
+    public async Task<int> CreateBook(CreateBookDtoo dto)
+    {
+        if (string.IsNullOrWhiteSpace(dto.Title))
+            throw BadRequestException.Required("Title");
+
+        dto.Title = dto.Title.Trim();
+                
+        if (dto.Stock < 0)
+            throw new BadRequestException("invalid stock");
+
+        if (dto.Price <= 0)
+            throw new BadRequestException("invalid price");
+
+        var currentYear = DateTime.Now.Year;
+
+        if (dto.PublishYear < 1800 || dto.PublishYear > currentYear)
+            throw new BadRequestException("invalid publish year");
+
+        if (!await _authorRepository.ExistsByIdAsync(dto.AuthorId))
+            throw new ItemNotFoundException("Author",dto.AuthorId);
+
+        if (!await _categoryRepository.ExistsByIdAsync(dto.CategoryId))
+            throw new ItemNotFoundException("Category",dto.CategoryId);
+
+        if (!await _publisherRepository.ExistsByIdAsync(dto.PublisherId))
+            throw new ItemNotFoundException("Publisher",dto.PublisherId);
+
+        var book = new Book
+        {
+            Title = dto.Title,
+            Price = dto.Price,
+            PublishYear = dto.PublishYear,
+            Stock = dto.Stock,
+            AuthorId = dto.AuthorId,
+            CategoryId = dto.CategoryId,
+            PublisherId = dto.PublisherId
+        };
+
+        await _bookRepository.AddAsync(book);
+
+        return book.Id;
+    }
         
 }

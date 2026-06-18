@@ -19,4 +19,6 @@ public interface IGenericRepository<T> where T : BaseEntity
     
     Task<List<T>> QueryAsync(Expression<Func<T, bool>> predicate, bool tracking = false);
     
+    Task<bool> ExistsByIdAsync(int id);
+    
 }
