@@ -1,5 +1,6 @@
 using CW21Ta23.Domain.Dto;
 using CW21Ta23.Domain.ServiceIntefaces;
+using CW21Ta23.WebApi.ResultPatterns;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CW21Ta23.WebApi.Controllers;
@@ -61,31 +62,25 @@ public class BookController : ControllerBase
         }
     }
     [HttpPost]
-    public async Task<IActionResult> CreateBook([FromBody] CreateBookDto dto)
+    public async Task<IActionResult> CreateBook([FromBody] CreateBookDtoo dto)
     {
-        try
-        {
-            await _bookService.CreateBookAsync(dto);
-            return Ok("book created");
-        }
-        catch (Exception ex)
-        {
-            return NotFound(ex.Message);
-        }
+        var id = await _bookService.CreateBook(dto);
+
+        var response = GenericResult<int>.Success(id, "Book created successfully", 201);
+
+        return StatusCode(201, response);
     }
+    
     [HttpGet("category/{categoryId}")]
     public async Task<IActionResult> GetBookByCategory(int categoryId)
     {
-        try
-        {
+        
+        
             var books = await _bookService.GetBookByCategory(categoryId);
-
-            return Ok(books);
-        }
-        catch (Exception ex)
-        {
-            return NotFound(ex.Message);
-        }
+            
+            var response = GenericResult<List<BookModelDto>>.Success(books, "ok", 200);
+                
+            return StatusCode(200,response);
     }
     [HttpGet("author/{authorId}")]
     public async Task<IActionResult> GetBookByAuthor(int authorId)

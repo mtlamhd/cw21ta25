@@ -69,4 +69,9 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 
         return await query.ToListAsync();
     }
+    public async Task<bool> ExistsByIdAsync(int id)
+    {
+        return await _dbSet
+            .AnyAsync(x => x.Id == id);
+    }
 }

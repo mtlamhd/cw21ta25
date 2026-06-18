@@ -3,6 +3,7 @@ using CW21Ta23.Domain.ServiceIntefaces;
 using CW21Ta23.Infrastructure.Data;
 using CW21Ta23.Infrastructure.Repositiries;
 using CW21Ta23.Service;
+using CW21Ta23.WebApi.Middlewares;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,6 +39,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 

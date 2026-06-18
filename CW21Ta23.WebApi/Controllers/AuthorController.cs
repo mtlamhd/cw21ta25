@@ -14,8 +14,7 @@ public class AuthorController : ControllerBase
     _authorService = authorService;
   }
   [HttpGet]
-  public async Task<IActionResult>
-    GetAllAuthorsWithBookCount()
+  public async Task<IActionResult>GetAllAuthorsWithBookCount()
   {
     var authors = await _authorService
       .GetAuthorsWithBooksCount();

@@ -71,6 +71,11 @@ public class BookModelBuilderConfiguration : BaseModelBuilderConfiguration<Book>
                     j.HasKey("BooksId", "TagsId");   // ✅ این خط خیلی مهمه
                     j.ToTable("BookTags");
                 });
+
+        modelBuilder.HasMany(b => b.OrderItems)
+            .WithOne(b => b.Book)
+            .HasForeignKey(b => b.BookId)
+            .OnDelete(DeleteBehavior.Restrict);
         
         modelBuilder.HasData(SeedData.SeedData.Books);
     }

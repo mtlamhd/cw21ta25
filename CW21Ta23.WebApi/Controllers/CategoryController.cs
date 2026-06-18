@@ -59,16 +59,8 @@ public class CategoryController : ControllerBase
         int id,
         [FromBody] UpdateCategoryDto dto)
     {
-        try
-        {
-            await _categoryService.UpdateCategoryAsync(id, dto);
-
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            return NotFound(ex.Message);
-        }
+        var category = await _categoryService.UpdateCategoryAsync(id, dto);
+        return Ok(category);
     }
     
     [HttpDelete("{id}")]

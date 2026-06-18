@@ -2,6 +2,7 @@ using CW21Ta23.Domain.Dto;
 using CW21Ta23.Domain.Entities;
 using CW21Ta23.Domain.RepositoryInterFaces;
 using CW21Ta23.Domain.ServiceIntefaces;
+using CW21Ta23.Service.Exceptions;
 
 namespace CW21Ta23.Service;
 
@@ -110,7 +111,7 @@ public class AuthorService : IAuthorService
         var author = await _authorRepository.GetAuthorByIdAsync(authorId);
 
         if (author == null)
-            throw new Exception("author not found");
+            throw new ItemNotFoundException("Author",authorId);
 
         return author;
     }
@@ -123,7 +124,7 @@ public class AuthorService : IAuthorService
     public async Task<List<AuthorWithBookDto>> GeAuthorsByName(string authorName)
     {
         if(string.IsNullOrWhiteSpace(authorName))
-            throw new Exception("authorName is Required");
+            throw BadRequestException.Required("AuthorName");
         
         var authors = await _authorRepository.GeAuthorsByName(authorName);
         
@@ -134,9 +135,9 @@ public class AuthorService : IAuthorService
     public async Task<int> CreateAuthor(CreateAuthorDto dto)
     {
         if(string.IsNullOrWhiteSpace(dto.FullName))
-            throw new Exception("Fullname is Required");
+            throw BadRequestException.Required("Fullname");
         if (dto.FullName.Length > 100)
-            throw new Exception("FullName is too long");
+            throw  BadRequestException.TooLong("FullName",100);
         var author = new Author
         {
             FullName = dto.FullName,
@@ -152,10 +153,10 @@ public class AuthorService : IAuthorService
         var author = await _authorRepository.GetByIdWithBookAsync(authorId);
 
         if (author == null)
-            throw new Exception("author not found");
+            throw new ItemNotFoundException("Author",authorId);
 
         if (author.Books.Any())
-            throw new Exception("cannot delete author because it has books");
+            throw BusinessRuleException.CannotDelete("Author", "it has books");
 
         await _authorRepository.HardDeleteAsync(author);
 
@@ -167,13 +168,13 @@ public class AuthorService : IAuthorService
         var author = await _authorRepository.FindByIdAsync(id);
 
         if (author == null)
-            throw new Exception("author not found");
+            throw new ItemNotFoundException("Author",id);
 
         if (string.IsNullOrWhiteSpace(dto.FullName))
-            throw new Exception("full name is required");
+            throw BadRequestException.Required("full name");
 
         if (dto.FullName.Length > 100)
-            throw new Exception("full name is too long");
+            throw BadRequestException.TooLong("FullName",100);
 
         author.FullName = dto.FullName;
         author.BirthDate = dto.BirthDate ?? default;
